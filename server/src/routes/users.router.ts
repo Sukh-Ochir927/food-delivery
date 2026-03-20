@@ -1,8 +1,8 @@
 import express from "express";
-import { getUsers } from "../controller/users/get-users";
 import { createUsers } from "../controller/users/create-user";
 import { updateUsers } from "../controller/users/update-user";
 import { deleteUsers } from "../controller/users/delete-user";
+import { getUsers } from "../controller/users/get-users";
 
 const router = express.Router();
 
