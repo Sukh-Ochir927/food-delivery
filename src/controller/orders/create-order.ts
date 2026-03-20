@@ -1,12 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
-
-type FoodOrder = { foodId: number; quantity: number };
-
-type BodyType = {
-  orderedFoods: FoodOrder[];
-  userId: number;
-};
+import { BodyType, FoodOrder } from "./order-types";
 
 export const createOrder = async (req: Request, res: Response) => {
   const { userId, orderedFoods }: BodyType = req.body;

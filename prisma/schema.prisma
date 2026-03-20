@@ -11,10 +11,19 @@ datasource db {
   // url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  MODERATOR
+  GUEST
+  SUPERADMIN
+}
+
 model User {
   id         Int         @id @default(autoincrement())
   email      String      @unique
   password   String
+  role       Role        @default(USER)
   age        Int?
   name       String
   foodOrders FoodOrder[]
