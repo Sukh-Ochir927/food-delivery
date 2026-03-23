@@ -37,6 +37,7 @@ model Food {
   FoodCategoryId Int
   foodOrderItem  FoodOrderItem[]
   description    String?
+  posterPath     String?
 
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt()

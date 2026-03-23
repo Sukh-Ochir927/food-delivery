@@ -2,11 +2,11 @@ import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { Role } from "../../generated/prisma/enums";
 
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    console.log("email: ", email);
 
     const user = await prisma.user.findUnique({
       where: { email },
@@ -25,6 +25,7 @@ export const login = async (req: Request, res: Response) => {
             userId: user.id,
             email: user.email,
             name: user.name,
+            role: user.role,
           },
         },
         process.env.JWT_SECRET ?? "secret",

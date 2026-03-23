@@ -16,7 +16,7 @@ app.use("/orders", orderRouter);
 app.use("/orders:id", usersRouter);
 app.use("/login", loginRouter);
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
