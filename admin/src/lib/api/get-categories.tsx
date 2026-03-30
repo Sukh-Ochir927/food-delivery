@@ -1,3 +1,5 @@
+import { Categories } from "@/app/dashboard/orders/types/types";
+
 const getCategoriesUrl = "http://localhost:3001/categories";
 
 const options = {
@@ -8,12 +10,10 @@ const options = {
   },
 };
 
-export const getCategories = async () => {
+export const getCategories = async (): Promise<Categories[]> => {
   const response = await fetch(`${getCategoriesUrl}`, options);
 
   const category = await response.json();
-
-  console.log(category);
 
   return category;
 };

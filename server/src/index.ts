@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import foodsRouter from "./routes/foods.router";
 import categoryRouter from "./routes/categories.router";
 import usersRouter from "./routes/users.router";
@@ -7,6 +8,7 @@ import loginRouter from "./routes/login.router";
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use("/foods", foodsRouter);
 app.use("/categories", categoryRouter);

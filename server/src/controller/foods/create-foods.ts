@@ -3,16 +3,23 @@ import { prisma } from "../../lib/prisma";
 
 export const createFoods = async (req: Request, res: Response) => {
   const { name, price, FoodCategoryId, description, posterPath } = req.body;
+  console.log(req.body);
 
-  const foods = await prisma.food.create({
-    data: {
-      name,
-      price,
-      FoodCategoryId,
-      description,
-      posterPath,
-    },
-  });
+  try {
+    const foods = await prisma.food.create({
+      data: {
+        name,
+        price,
+        FoodCategoryId,
+        description,
+        posterPath,
+      },
+    });
+    res.status(201).json(foods);
+  } catch (error) {
+    console.log(error);
+    res.send(error);
+  }
 
-  res.json(foods);
+  res.json("ok");
 };

@@ -29,7 +29,7 @@ export const login = async (req: Request, res: Response) => {
           },
         },
         process.env.JWT_SECRET ?? "secret",
-        { expiresIn: "1h" },
+        // { expiresIn: "1h" },
       );
       return res.status(200).send({ message: "Login sucessfully", token });
     } else {

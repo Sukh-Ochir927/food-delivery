@@ -1,4 +1,4 @@
-import { getOrders } from "@/lib/api/getOrders";
+import { getOrders } from "@/lib/api/get-orders";
 import Link from "next/link";
 
 export default function Home() {
@@ -11,3 +11,4 @@ export default function Home() {
     </div>
   );
 }
+  

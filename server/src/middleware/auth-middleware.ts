@@ -16,7 +16,7 @@ export const authMiddleWare = (
 ) => {
   const autherization = req.headers.authorization;
 
-  if (!autherization) return res.status(400).send("invalid");
+  if (!autherization) return res.status(400).send({ meesage: "invalid" });
 
   const accessToken = autherization.split(" ")[1];
   console.log(accessToken);
