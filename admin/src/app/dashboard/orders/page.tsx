@@ -1,9 +1,13 @@
+import { getOrders } from "@/lib/api/get-orders";
 import { OrdersTable } from "./components/OrdersTable";
 
-export default function Home() {
+
+export default async function OrdersPage() {
+  const orders = await getOrders();
   return (
     <div>
-      <OrdersTable />
+      
+      <OrdersTable orders={orders} />
     </div>
   );
 }

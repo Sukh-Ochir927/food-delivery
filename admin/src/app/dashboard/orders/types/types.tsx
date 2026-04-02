@@ -1,13 +1,3 @@
-export type RootFoodOrderList = Categories[];
-
-export interface Categories {
-  id: number;
-  name: string;
-  createAt: string;
-  updatedAt: string;
-  foods: Food[];
-}
-
 export interface Food {
   id: number;
   name: string;
@@ -17,10 +7,43 @@ export interface Food {
   posterPath?: string;
   createAt: string;
   updatedAt: string;
-  foodOrderItem: FoodOrderItem[];
 }
 
-export interface FoodOrderItem {
+export interface FoodOrderItemWithFood extends FoodOrderItems {
+  food: Food;
+}
+
+export type Order = {
+  id: number;
+  userId: number;
+  totalPrice: string;
+  status: string;
+  createAt: string;
+  updatedAt: string;
+  FoodOrderItems: FoodOrderItemWithFood[];
+  userOrder: {
+    id: number;
+    email: string;
+    password: string;
+    role: string;
+    age: number;
+    name: string;
+  };
+};
+
+export type Orders = Order[];
+
+export type Categories = Categories2[];
+
+export interface Categories2 {
+  id: number;
+  name: string;
+  createAt: string;
+  updatedAt: string;
+  foods: Food[];
+}
+
+export interface FoodOrderItems {
   id: number;
   quantity: number;
   foodId: number;

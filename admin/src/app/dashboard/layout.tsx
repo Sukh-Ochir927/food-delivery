@@ -9,7 +9,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       className="bg-white"
     >
       <AppSidebar />
-      <main className="bg-gray-100">
+      <main className="bg-gray-100 w-full min-h-screen p-4">  
         <Header />
 
         {children}

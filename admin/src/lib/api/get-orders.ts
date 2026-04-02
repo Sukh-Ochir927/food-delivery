@@ -1,4 +1,4 @@
-import { Orders } from "@/app/dashboard/orders/components/Header";
+import { Orders } from "@/app/dashboard/orders/types/types";
 
 const getOrderUrl = "http://localhost:3001/orders";
 
@@ -10,12 +10,12 @@ const options = {
   },
 };
 
-export const getOrders = async (): Promise<Orders[]> => {
+export const getOrders = async (): Promise<Orders> => {
   const response = await fetch(`${getOrderUrl}`, options);
 
   const orders = await response.json();
 
-  console.log(orders);
+  console.log("Orders: end bainaa", orders);
 
   return orders;
 };
