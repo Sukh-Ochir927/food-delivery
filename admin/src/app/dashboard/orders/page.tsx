@@ -1,7 +1,9 @@
+import { OrdersTable } from "./components/OrdersTable";
+
 export default function Home() {
   return (
     <div>
-      <h1>hhh</h1>
+      <OrdersTable />
     </div>
   );
 }

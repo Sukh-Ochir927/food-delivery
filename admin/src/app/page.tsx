@@ -1,14 +1,9 @@
-import { getOrders } from "@/lib/api/get-orders";
-import Link from "next/link";
+import SignIn from "./dashboard/login/SignInPage";
 
 export default function Home() {
-  const data = getOrders();
   return (
     <div>
-      <Link href="/dashboard/foods">
-        <h1>Login</h1>
-      </Link>
+      <SignIn />
     </div>
   );
 }
-  

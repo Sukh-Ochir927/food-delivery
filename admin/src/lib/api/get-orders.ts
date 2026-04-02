@@ -1,3 +1,5 @@
+import { Orders } from "@/app/dashboard/orders/components/Header";
+
 const getOrderUrl = "http://localhost:3001/orders";
 
 const options = {
@@ -8,7 +10,7 @@ const options = {
   },
 };
 
-export const getOrders = async () => {
+export const getOrders = async (): Promise<Orders[]> => {
   const response = await fetch(`${getOrderUrl}`, options);
 
   const orders = await response.json();

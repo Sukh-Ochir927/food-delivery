@@ -1,5 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { Header } from "./_components/Header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -8,8 +9,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       className="bg-white"
     >
       <AppSidebar />
-      <main>
-        <SidebarTrigger />
+      <main className="bg-gray-100">
+        <Header />
+
         {children}
       </main>
     </SidebarProvider>

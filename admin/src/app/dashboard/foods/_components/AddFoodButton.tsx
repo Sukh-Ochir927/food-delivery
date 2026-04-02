@@ -11,7 +11,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ImageIcon, Plus } from "lucide-react";
-import { ChangeEventHandler, useState } from "react";
+import { ChangeEventHandler, use, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Categories } from "../../orders/types/types";
 
@@ -27,6 +28,8 @@ type CategoryProps = {
 };
 
 export function AddFoodButton({ category }: CategoryProps) {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
   const [food, setFood] = useState<Food>({
     name: "",
     price: "",
@@ -56,13 +59,16 @@ export function AddFoodButton({ category }: CategoryProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
+
+      router.refresh();
+      setIsOpen(false);
     } catch (error) {
       console.log(error);
     }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger>
         <div className="w-full h-full border border-red-500 border-dashed rounded-2xl flex flex-col gap-6 p-2 items-center justify-center">
           <div className=" bg-red-500 h-9 w-9 rounded-full flex justify-center items-center  text-white">
