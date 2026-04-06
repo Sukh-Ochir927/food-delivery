@@ -1,9 +1,9 @@
 import { getCategories } from "@/lib/api/get-categories";
-import { Categories } from "../../orders/types/types";
+import { Categories, Categories2 } from "../../orders/types/types";
 import { AddCategoryButton } from "./AddCategoryButton";
 
 const CategoriesTable = async () => {
-  const categoriesData: Categories[] = await getCategories();
+  const categoriesData: Categories = await getCategories();
   const totalFoods = categoriesData.reduce(
     (acc, category) => acc + category.foods.length,
     0,

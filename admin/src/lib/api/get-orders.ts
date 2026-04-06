@@ -10,7 +10,7 @@ const options = {
   },
 };
 
-export const getOrders = async (): Promise<Orders> => {
+export const getOrders = async (): Promise<Orders[]> => {
   const response = await fetch(`${getOrderUrl}`, options);
 
   const orders = await response.json();
