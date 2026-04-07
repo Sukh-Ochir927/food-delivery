@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { Role } from "../../generated/prisma/enums";
 
 export const login = async (req: Request, res: Response) => {
   try {
