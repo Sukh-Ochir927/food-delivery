@@ -19,7 +19,6 @@ export const authMiddleWare = (
   if (!autherization) return res.status(400).send({ meesage: "invalid" });
 
   const accessToken = autherization.split(" ")[1];
-  console.log(accessToken);
 
   try {
     const decoded = jwt.verify(
