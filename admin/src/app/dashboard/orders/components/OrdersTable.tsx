@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-
 import { OrderTableHeader } from "./OrderTableHeader";
 import { Order } from "@/lib/api/get-orders";
 

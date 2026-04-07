@@ -39,8 +39,6 @@ export type Order = {
   };
 };
 
-// export type Orders = Order[];
-
 export type Categories = Categories2[];
 
 export interface Categories2 {

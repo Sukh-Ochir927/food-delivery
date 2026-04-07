@@ -1,7 +1,4 @@
-import {
-  FoodOrderItemWithFood,
-  Orders,
-} from "@/app/dashboard/orders/types/types";
+import { FoodOrderItemWithFood } from "@/app/dashboard/orders/types/types";
 
 export type Order = {
   id: number;
