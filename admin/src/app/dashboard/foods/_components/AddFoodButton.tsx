@@ -5,7 +5,7 @@ import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CldUploadWidget } from "next-cloudinary";
 
-import { Categories, Categories2 } from "../../orders/types/types";
+import { Categories2 } from "../../orders/types/types";
 
 type Food = {
   name: string;

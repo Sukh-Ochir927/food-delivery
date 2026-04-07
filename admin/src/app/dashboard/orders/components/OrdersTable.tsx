@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Order } from "../types/types";
+
 import { OrderTableHeader } from "./OrderTableHeader";
+import { Order } from "@/lib/api/get-orders";
 
 const statusStyles: Record<string, string> = {
   Pending: "border border-red-400 text-red-400",

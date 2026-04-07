@@ -7,7 +7,7 @@ export const HeroSection = async () => {
   const categories: Categories = await getCategories();
   return (
     <div className="w-full  flex flex-col gap-4">
-      {categories.map((category) => (
+      {categories?.map((category) => (
         <div key={category.id} className="border-2  rounded-2xl p-5 bg-white">
           <div className="flex items-center gap-2 mb-4">
             <h1 className="font-semibold">{category.name}</h1>

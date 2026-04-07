@@ -12,6 +12,14 @@ export interface Food {
 export interface FoodOrderItemWithFood extends FoodOrderItems {
   food: Food;
 }
+export interface FoodOrderItems {
+  id: number;
+  quantity: number;
+  foodId: number;
+  foodOrderId: number;
+  createAt: string;
+  updatedAt: string;
+}
 
 export type Order = {
   id: number;
@@ -31,7 +39,7 @@ export type Order = {
   };
 };
 
-export type Orders = Order[];
+// export type Orders = Order[];
 
 export type Categories = Categories2[];
 
@@ -41,13 +49,4 @@ export interface Categories2 {
   createAt: string;
   updatedAt: string;
   foods: Food[];
-}
-
-export interface FoodOrderItems {
-  id: number;
-  quantity: number;
-  foodId: number;
-  foodOrderId: number;
-  createAt: string;
-  updatedAt: string;
 }
