@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const res = await fetch("http://localhost:3001/login", {
+    const res = await fetch("https://food-delivery-lmwy.onrender.com/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
