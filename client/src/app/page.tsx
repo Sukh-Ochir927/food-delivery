@@ -1,7 +1,8 @@
 import { fallbackCategories } from "@/data/fallbackMenu";
 import { MenuShell } from "@/components/MenuShell";
 import type { Category } from "@/types/menu";
-import { apiUrl } from "@/lib/api";
+import { apiUrl, logApiFetchError } from "@/lib/api";
+import { unstable_rethrow } from "next/navigation";
 
 export default async function Home() {
   const categories = await getCategories();
@@ -16,11 +17,22 @@ async function getCategories(): Promise<Category[]> {
     });
 
     if (!response.ok) {
+      logApiFetchError({
+        endpoint: "/categories",
+        url: apiUrl("/categories"),
+        status: response.status,
+      });
       return fallbackCategories;
     }
 
     return response.json();
-  } catch {
+  } catch (error) {
+    unstable_rethrow(error);
+    logApiFetchError({
+      endpoint: "/categories",
+      url: apiUrl("/categories"),
+      error,
+    });
     return fallbackCategories;
   }
 }

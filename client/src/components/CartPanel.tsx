@@ -9,6 +9,9 @@ type CartPanelProps = {
   address: string;
   addressTouched: boolean;
   cartItems: CartItem[];
+  checkoutError: string;
+  checkoutSuccess: string;
+  isCheckingOut: boolean;
   onAddressChange: (address: string) => void;
   onAddressTouched: () => void;
   onCheckout: () => void;
@@ -20,6 +23,9 @@ export function CartPanel({
   address,
   addressTouched,
   cartItems,
+  checkoutError,
+  checkoutSuccess,
+  isCheckingOut,
   onAddressChange,
   onAddressTouched,
   onCheckout,
@@ -147,6 +153,9 @@ export function CartPanel({
 
           <PaymentInfo
             checkoutDisabled={checkoutDisabled}
+            checkoutError={checkoutError}
+            checkoutSuccess={checkoutSuccess}
+            isCheckingOut={isCheckingOut}
             itemsTotal={itemsTotal}
             shipping={shipping}
             onCheckout={onCheckout}
@@ -193,11 +202,17 @@ function DeliveryLocation({
 
 function PaymentInfo({
   checkoutDisabled,
+  checkoutError,
+  checkoutSuccess,
+  isCheckingOut,
   itemsTotal,
   shipping,
   onCheckout,
 }: {
   checkoutDisabled: boolean;
+  checkoutError: string;
+  checkoutSuccess: string;
+  isCheckingOut: boolean;
   itemsTotal: number;
   shipping: number;
   onCheckout: () => void;
@@ -222,12 +237,18 @@ function PaymentInfo({
       </div>
       <button
         type="button"
-        disabled={checkoutDisabled}
+        disabled={checkoutDisabled || isCheckingOut}
         onClick={onCheckout}
         className="mt-5 h-13 w-full rounded-full bg-[#ef4444] text-sm font-black text-white transition hover:bg-[#d92323] disabled:cursor-not-allowed disabled:bg-neutral-300 disabled:text-neutral-500"
       >
-        Checkout
+        {isCheckingOut ? "Checking out..." : "Checkout"}
       </button>
+      {checkoutError ? (
+        <p className="mt-3 text-sm font-bold text-[#ef4444]">{checkoutError}</p>
+      ) : null}
+      {checkoutSuccess ? (
+        <p className="mt-3 text-sm font-bold text-green-700">{checkoutSuccess}</p>
+      ) : null}
     </section>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import type { CartItem, Category, Food } from "@/types/menu";
 import { CartPanel } from "./CartPanel";
@@ -20,7 +20,11 @@ export function MenuShell({ categories }: MenuShellProps) {
   const [address, setAddress] = useState("");
   const [addressTouched, setAddressTouched] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [showLoginRequired, setShowLoginRequired] = useState(false);
+  const [pendingCartItem, setPendingCartItem] = useState<CartItem | null>(null);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [checkoutSuccess, setCheckoutSuccess] = useState("");
   const [toast, setToast] = useState("");
 
   const heroFood = useMemo(
@@ -28,12 +32,33 @@ export function MenuShell({ categories }: MenuShellProps) {
     [categories],
   );
 
-  const addFoodToCart = (food: Food, quantity: number) => {
-    if (!isLoggedIn) {
-      setShowLoginRequired(true);
-      return;
-    }
+  useEffect(() => {
+    let isMounted = true;
 
+    fetch("/api/auth", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (isMounted) {
+          setIsLoggedIn(Boolean(data.authenticated));
+        }
+      })
+      .catch(() => {
+        if (isMounted) {
+          setIsLoggedIn(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const showCartToast = () => {
+    setToast("Food is being added to the cart!");
+    window.setTimeout(() => setToast(""), 2200);
+  };
+
+  const addItemToCart = (food: Food, quantity: number) => {
     setCartItems((items) => {
       const existingItem = items.find((item) => item.food.id === food.id);
 
@@ -49,8 +74,17 @@ export function MenuShell({ categories }: MenuShellProps) {
     });
 
     setSelectedFood(null);
-    setToast("Food is being added to the cart!");
-    window.setTimeout(() => setToast(""), 2200);
+    showCartToast();
+  };
+
+  const addFoodToCart = (food: Food, quantity: number) => {
+    if (!isLoggedIn) {
+      setPendingCartItem({ food, quantity });
+      setShowLoginRequired(true);
+      return;
+    }
+
+    addItemToCart(food, quantity);
   };
 
   const updateCartQuantity = (foodId: number, quantity: number) => {
@@ -65,13 +99,92 @@ export function MenuShell({ categories }: MenuShellProps) {
     setCartItems((items) => items.filter((item) => item.food.id !== foodId));
   };
 
-  const requireLoginThen = (food: Food) => {
+  const openFoodDetail = (food: Food) => {
     setSelectedFood(food);
+  };
+
+  const openLoginModal = () => {
+    setPendingCartItem(null);
+    setShowLoginRequired(true);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setShowLoginRequired(false);
+
+    if (pendingCartItem) {
+      addItemToCart(pendingCartItem.food, pendingCartItem.quantity);
+      setPendingCartItem(null);
+    }
+  };
+
+  const logout = async () => {
+    await fetch("/api/auth", { method: "DELETE" }).catch(() => null);
+    setIsLoggedIn(false);
+    setCartItems([]);
+    setCheckoutError("");
+    setCheckoutSuccess("");
+  };
+
+  const checkout = async () => {
+    setAddressTouched(true);
+    setCheckoutError("");
+    setCheckoutSuccess("");
+
+    if (!isLoggedIn) {
+      setShowLoginRequired(true);
+      return;
+    }
+
+    if (address.trim().length === 0 || cartItems.length === 0) {
+      return;
+    }
+
+    setIsCheckingOut(true);
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderedFoods: cartItems.map((item) => ({
+            foodId: item.food.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+
+      if (response.status === 401) {
+        setIsLoggedIn(false);
+        setShowLoginRequired(true);
+        return;
+      }
+
+      if (!response.ok) {
+        setCheckoutError(data.message ?? "Checkout failed. Please try again.");
+        return;
+      }
+
+      setCartItems([]);
+      setCheckoutSuccess("Order placed successfully.");
+    } catch {
+      setCheckoutError("Checkout is unavailable right now. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-[#181818] text-white">
-      <Navbar address={address} cartCount={cartItems.length} onAddressChange={setAddress} />
+      <Navbar
+        address={address}
+        cartCount={cartItems.length}
+        isLoggedIn={isLoggedIn}
+        onAddressChange={setAddress}
+        onLogout={logout}
+        onRequestLogin={openLoginModal}
+      />
 
       <main className="mx-auto flex w-full max-w-[1440px] gap-8 px-4 pb-[620px] pt-24 sm:px-6 lg:px-8 xl:pb-16 xl:pr-[420px]">
         <div className="min-w-0 flex-1 space-y-10">
@@ -107,8 +220,8 @@ export function MenuShell({ categories }: MenuShellProps) {
               <CategorySection
                 key={category.id}
                 category={category}
-                onFoodSelect={requireLoginThen}
-                onQuickAdd={requireLoginThen}
+                onFoodSelect={openFoodDetail}
+                onQuickAdd={(food) => addFoodToCart(food, 1)}
               />
             ))}
           </div>
@@ -119,9 +232,12 @@ export function MenuShell({ categories }: MenuShellProps) {
         address={address}
         addressTouched={addressTouched}
         cartItems={cartItems}
+        checkoutError={checkoutError}
+        checkoutSuccess={checkoutSuccess}
+        isCheckingOut={isCheckingOut}
         onAddressChange={setAddress}
         onAddressTouched={() => setAddressTouched(true)}
-        onCheckout={() => setAddressTouched(true)}
+        onCheckout={checkout}
         onRemoveItem={removeCartItem}
         onUpdateQuantity={updateCartQuantity}
       />
@@ -139,14 +255,7 @@ export function MenuShell({ categories }: MenuShellProps) {
       {showLoginRequired ? (
         <LoginRequiredModal
           onClose={() => setShowLoginRequired(false)}
-          onLogin={() => {
-            setIsLoggedIn(true);
-            setShowLoginRequired(false);
-          }}
-          onSignup={() => {
-            setIsLoggedIn(true);
-            setShowLoginRequired(false);
-          }}
+          onLoginSuccess={handleLoginSuccess}
         />
       ) : null}
 

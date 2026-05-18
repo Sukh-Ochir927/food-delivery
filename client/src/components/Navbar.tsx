@@ -1,10 +1,20 @@
 type NavbarProps = {
   address: string;
   cartCount: number;
+  isLoggedIn: boolean;
   onAddressChange: (address: string) => void;
+  onLogout: () => void;
+  onRequestLogin: () => void;
 };
 
-export function Navbar({ address, cartCount, onAddressChange }: NavbarProps) {
+export function Navbar({
+  address,
+  cartCount,
+  isLoggedIn,
+  onAddressChange,
+  onLogout,
+  onRequestLogin,
+}: NavbarProps) {
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-[#181818]/95 backdrop-blur">
       <div className="mx-auto flex h-20 max-w-[1440px] items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
@@ -48,10 +58,11 @@ export function Navbar({ address, cartCount, onAddressChange }: NavbarProps) {
 
           <button
             type="button"
-            aria-label="Profile"
+            aria-label={isLoggedIn ? "Log out" : "Log in"}
+            onClick={isLoggedIn ? onLogout : onRequestLogin}
             className="grid h-11 w-11 place-items-center rounded-full bg-white text-sm font-black text-[#171717] shadow-lg transition hover:bg-neutral-100"
           >
-            U
+            {isLoggedIn ? "Out" : "In"}
           </button>
         </div>
       </div>
