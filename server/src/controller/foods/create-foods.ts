@@ -15,11 +15,9 @@ export const createFoods = async (req: Request, res: Response) => {
         posterPath,
       },
     });
-    res.status(201).json(foods);
+    return res.status(201).json(foods);
   } catch (error) {
     console.log(error);
-    res.send(error);
+    return res.status(500).json({ message: "Failed to create food", error });
   }
-
-  res.json("ok");
 };
