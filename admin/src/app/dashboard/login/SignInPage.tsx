@@ -27,26 +27,32 @@ const SignIn = () => {
 export default SignIn;
 
 type SignInResponse = {
-  token: string;
   success: boolean;
+  message: string;
 };
 
 const SignInPage = (): JSX.Element => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const onSubmit = async () => {
     try {
       setLoading(true);
+      setErrorMessage("");
       const data = await signIn({ email, password });
-      if (data?.success) {
-        console.log("Login successful, token:", data.token);
-        router.push("/dashboard/foods");
+      if (data.success) {
+        router.push("/dashboard");
+        router.refresh();
+        return;
       }
+
+      setErrorMessage(data.message);
     } catch (error) {
       console.log(error);
+      setErrorMessage("INVALID_PASSWORD");
     } finally {
       setLoading(false);
     }
@@ -70,6 +76,11 @@ const SignInPage = (): JSX.Element => {
         type="password"
         onChange={(event) => setPassword(event.target.value)}
       ></Input>
+      {errorMessage ? (
+        <p className="text-sm font-medium text-red-600" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
 
       <Button onClick={onSubmit} disabled={loading} type="submit">
         {loading ? "Logging in..." : "Log In"}

@@ -4,13 +4,13 @@ type UserData = {
 };
 
 type SignInResponse = {
-  token: string;
   success: boolean;
+  message: string;
 };
 
 export const signIn = async (
   userData: UserData,
-): Promise<SignInResponse | null> => {
+): Promise<SignInResponse> => {
   try {
     const response = await fetch("/api/auth", {
       method: "POST",
@@ -25,5 +25,6 @@ export const signIn = async (
     return data;
   } catch (error) {
     console.log(error);
+    return { success: false, message: "INVALID_PASSWORD" };
   }
 };
