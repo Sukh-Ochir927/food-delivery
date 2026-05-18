@@ -1,5 +1,3 @@
-import Cookies from "js-cookie";
-
 type UserData = {
   email: string;
   password: string;
@@ -14,13 +12,10 @@ export const signIn = async (
   userData: UserData,
 ): Promise<SignInResponse | null> => {
   try {
-    const token = Cookies.get("token");
-
     const response = await fetch("/api/auth", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(userData),
     });

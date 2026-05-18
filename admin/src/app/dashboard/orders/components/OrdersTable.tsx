@@ -102,6 +102,7 @@ export const OrdersTable = ({ orders }: { orders: Order[] }) => {
                             {item.food.posterPath && (
                               <img
                                 src={item.food.posterPath}
+                                alt={item.food.name}
                                 className="w-8 h-8 rounded object-cover"
                               />
                             )}

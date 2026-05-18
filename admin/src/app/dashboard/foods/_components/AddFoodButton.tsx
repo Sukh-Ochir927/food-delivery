@@ -3,7 +3,7 @@
 import { ImageIcon, Plus, X } from "lucide-react";
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CldUploadWidget } from "next-cloudinary";
+import { uploadImage } from "@/lib/upload-image";
 
 import { Categories2 } from "../../orders/types/types";
 
@@ -53,7 +53,7 @@ export function AddFoodButton({ category }: CategoryProps) {
     };
     try {
       const response = await fetch(
-        "https://food-delivery-lmwy.onrender.com/foods",
+        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/foods`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -162,52 +162,52 @@ export function AddFoodButton({ category }: CategoryProps) {
                   Food image
                 </label>
 
-                <CldUploadWidget
-                  uploadPreset={
-                    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-                  }
-                  onSuccess={(result) => {
-                    const info = result?.info;
-                    if (
-                      info &&
-                      typeof info === "object" &&
-                      "secure_url" in info
-                    ) {
+                <label className="w-full border-2 border-dashed border-gray-200 rounded-lg bg-gray-50 p-10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-gray-100 transition-colors">
+                  {food.posterPath ? (
+                    <>
+                      <img
+                        src={food.posterPath}
+                        alt="Uploaded food"
+                        className="h-24 w-24 object-cover rounded-lg shadow"
+                      />
+                      <span className="text-xs text-gray-500 mt-1">
+                        Click to change image
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <ImageIcon size={28} className="text-gray-400" />
+                      <span className="text-sm text-gray-500">
+                        Choose a file or drag &amp; drop it here
+                      </span>
+                    </>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={async (event) => {
+                      const file = event.target.files?.[0];
+                      if (!file) return;
+                      const posterPath = await uploadImage(file);
                       setFood((prev) => ({
                         ...prev,
-                        posterPath: (info as { secure_url: string }).secure_url,
+                        posterPath,
                       }));
-                    }
-                  }}
-                >
-                  {({ open }) => (
-                    <button
-                      type="button"
-                      onClick={() => open()}
-                      className="w-full border-2 border-dashed border-gray-200 rounded-lg bg-gray-50 p-10 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-gray-100 transition-colors"
-                    >
-                      {food.posterPath ? (
-                        <>
-                          <img
-                            src={food.posterPath}
-                            alt="Uploaded food"
-                            className="h-24 w-24 object-cover rounded-lg shadow"
-                          />
-                          <span className="text-xs text-gray-500 mt-1">
-                            Click to change image
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <ImageIcon size={28} className="text-gray-400" />
-                          <span className="text-sm text-gray-500">
-                            Choose a file or drag &amp; drop it here
-                          </span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                </CldUploadWidget>
+                    }}
+                  />
+                </label>
+                <input
+                  value={food.posterPath}
+                  onChange={(event) =>
+                    setFood((prev) => ({
+                      ...prev,
+                      posterPath: event.target.value,
+                    }))
+                  }
+                  placeholder="Or paste an image URL"
+                  className="mt-3 w-full px-3 py-2 border border-gray-300 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition"
+                />
               </div>
             </div>
 

@@ -1,4 +1,6 @@
 import { FoodOrderItemWithFood } from "@/app/dashboard/orders/types/types";
+import { apiUrl, authHeaders } from "./config";
+import { cookies } from "next/headers";
 
 export type Order = {
   id: number;
@@ -18,20 +20,18 @@ export type Order = {
   };
 };
 
-const getOrderUrl = "http://localhost:3001/orders";
-
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${process.env.MY_TOKEN}`,
-  },
-};
-
 export const getOrders = async (): Promise<Order[]> => {
-  const response = await fetch(`${getOrderUrl}`, options);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
 
-  const orders = await response.json();
+  const response = await fetch(apiUrl("/orders"), {
+    cache: "no-store",
+    headers: authHeaders(token),
+  });
 
-  return orders;
+  if (!response.ok) {
+    return [];
+  }
+
+  return response.json();
 };

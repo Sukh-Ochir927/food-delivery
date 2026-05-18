@@ -1,18 +1,17 @@
 import { AppSidebar } from "@/components/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { Header } from "./_components/Header";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider
       style={{ "--sidebar-width": "205px" } as React.CSSProperties}
-      className="bg-white"
+      className="bg-[#f4f4f5]"
     >
       <AppSidebar />
-      <main className="bg-gray-100 w-full min-h-screen p-4">  
+      <main className="min-h-screen w-full bg-[#f4f4f5] p-4 sm:p-6">
         <Header />
-
-        {children}
+        <div className="mx-auto max-w-[1280px]">{children}</div>
       </main>
     </SidebarProvider>
   );

@@ -11,8 +11,8 @@ import Image from "next/image";
 import { useState, useTransition } from "react";
 
 const navItems = [
+  { href: "/dashboard/foods", label: "Food menu", icon: LayoutGrid },
   { href: "/dashboard/orders", label: "Orders", icon: Truck },
-  { href: "/dashboard/foods", label: "Foods", icon: LayoutGrid },
 ];
 
 export function AppSidebar() {
@@ -34,7 +34,7 @@ export function AppSidebar() {
   }
 
   return (
-    <Sidebar className="bg-white">
+    <Sidebar className="border-r bg-white">
       <SidebarHeader>
         <div className="flex items-center gap-2 p-4">
           <Image
@@ -63,7 +63,7 @@ export function AppSidebar() {
                 onClick={() => handleNavigate(href)}
                 disabled={isPending}
                 className={`flex gap-2 px-4 h-10 items-center rounded-full font-medium transition-colors w-full
-                  ${isActive ? "bg-black text-white" : "hover:bg-gray-100"}
+                  ${isActive ? "bg-black text-white" : "hover:bg-gray-100 text-gray-700"}
                   ${isLoading ? "opacity-60 cursor-not-allowed" : ""}`}
               >
                 {isLoading ? (

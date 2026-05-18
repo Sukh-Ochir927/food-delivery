@@ -1,19 +1,15 @@
 import { Categories } from "@/app/dashboard/orders/types/types";
-
-const getCategoriesUrl = "http://localhost:3001/categories";
-
-const options = {
-  method: "GET",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${process.env.MY_TOKEN}`,
-  },
-};
+import { apiUrl, authHeaders } from "./config";
 
 export const getCategories = async (): Promise<Categories> => {
-  const response = await fetch(`${getCategoriesUrl}`, options);
+  const response = await fetch(apiUrl("/categories"), {
+    cache: "no-store",
+    headers: authHeaders(),
+  });
 
-  const category = await response.json();
+  if (!response.ok) {
+    return [];
+  }
 
-  return category;
+  return response.json();
 };

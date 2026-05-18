@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { apiUrl, authHeaders } from "./config";
 
 type GetUserResponse = {
   id: number;
@@ -12,12 +13,14 @@ export const getUser = async (): Promise<GetUserResponse> => {
 
   const token = cookieStore.get("token")?.value;
 
-  const response = await fetch("http://localhost:3001/users/me", {
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
+  const response = await fetch(apiUrl("/users/me"), {
+    cache: "no-store",
+    headers: authHeaders(token),
   });
+
+  if (!response.ok) {
+    return { id: 0, role: "", email: "", name: "Admin" };
+  }
 
   const userData = await response.json();
 
