@@ -6,19 +6,6 @@ import type { Categories2, Food } from "../../orders/types/types";
 import { apiUrl } from "@/lib/api/config";
 import { uploadImage } from "@/lib/upload-image";
 
-const preferredCategories = [
-  "Appetizers",
-  "Salads",
-  "Pizzas",
-  "Lunch favorites",
-  "Main dishes",
-  "Fish & Sea foods",
-  "Brunch",
-  "Side dish",
-  "Desserts",
-  "Beverages",
-];
-
 type DishForm = {
   id?: number;
   name: string;
@@ -28,31 +15,75 @@ type DishForm = {
   FoodCategoryId: number;
 };
 
-export function AdminFoodManager({ initialCategories }: { initialCategories: Categories2[] }) {
+type CategoryWithFoods = Categories2 & {
+  categoryName?: string;
+};
+
+type FoodWithCategoryKeys = Food & {
+  categoryId?: number;
+  foodCategoryId?: number;
+  category?: { id?: number };
+};
+
+const getCategoryName = (category: CategoryWithFoods) =>
+  category.name || category.categoryName || "Untitled category";
+
+const getFoodCategoryId = (food: FoodWithCategoryKeys) =>
+  food.FoodCategoryId ?? food.categoryId ?? food.foodCategoryId ?? food.category?.id;
+
+const groupFoodsByCategory = (
+  categories: CategoryWithFoods[],
+  foods: FoodWithCategoryKeys[],
+): Categories2[] => {
+  const sourceFoods =
+    foods.length > 0
+      ? foods
+      : categories.flatMap((category) =>
+          Array.isArray(category.foods) ? category.foods : [],
+        );
+  const foodsByCategory = new Map<number, Food[]>();
+
+  for (const food of sourceFoods) {
+    const categoryId = getFoodCategoryId(food);
+    if (typeof categoryId !== "number") continue;
+
+    const groupedFoods = foodsByCategory.get(categoryId) ?? [];
+    groupedFoods.push({
+      ...food,
+      FoodCategoryId: categoryId,
+    });
+    foodsByCategory.set(categoryId, groupedFoods);
+  }
+
+  return categories.map((category) => ({
+    ...category,
+    name: getCategoryName(category),
+    foods: foodsByCategory.get(category.id) ?? [],
+  }));
+};
+
+export function AdminFoodManager({
+  initialCategories,
+  initialFoods,
+}: {
+  initialCategories: Categories2[];
+  initialFoods: Food[];
+}) {
   const [categories, setCategories] = useState(initialCategories);
+  const [foods, setFoods] = useState(initialFoods);
   const [activeCategory, setActiveCategory] = useState("All Dishes");
   const [editingDish, setEditingDish] = useState<DishForm | null>(null);
   const [deletedDish, setDeletedDish] = useState<Food | null>(null);
   const [toastOpen, setToastOpen] = useState(false);
 
   const normalizedCategories = useMemo(() => {
-    const existing = new Map(categories.map((category) => [category.name, category]));
+    return groupFoodsByCategory(categories, foods);
+  }, [categories, foods]);
 
-    return preferredCategories.map((name, index) => {
-      const category = existing.get(name);
-      return (
-        category || {
-          id: -index - 1,
-          name,
-          createAt: "",
-          updatedAt: "",
-          foods: [],
-        }
-      );
-    });
-  }, [categories]);
-
-  const totalFoods = categories.reduce((count, category) => count + category.foods.length, 0);
+  const totalFoods = normalizedCategories.reduce(
+    (count, category) => count + category.foods.length,
+    0,
+  );
   const visibleCategories =
     activeCategory === "All Dishes"
       ? normalizedCategories
@@ -60,20 +91,40 @@ export function AdminFoodManager({ initialCategories }: { initialCategories: Cat
   const hasLoadedCategories = categories.length > 0;
 
   const refreshCategories = async () => {
-    const endpoint = "/categories";
-    const url = apiUrl(endpoint);
+    const categoriesEndpoint = "/categories";
+    const foodsEndpoint = "/foods";
+    const categoriesUrl = apiUrl(categoriesEndpoint);
+    const foodsUrl = apiUrl(foodsEndpoint);
 
     try {
-      const response = await fetch(url, { cache: "no-store" });
-      if (response.ok) {
-        setCategories(await response.json());
+      const [categoriesResponse, foodsResponse] = await Promise.all([
+        fetch(categoriesUrl, { cache: "no-store" }),
+        fetch(foodsUrl, { cache: "no-store" }),
+      ]);
+
+      if (categoriesResponse.ok) {
+        setCategories(await categoriesResponse.json());
       } else {
-        console.error("[api] fetch failed", { endpoint, url, status: response.status });
+        console.error("[api] fetch failed", {
+          endpoint: categoriesEndpoint,
+          url: categoriesUrl,
+          status: categoriesResponse.status,
+        });
+      }
+
+      if (foodsResponse.ok) {
+        setFoods(await foodsResponse.json());
+      } else {
+        console.error("[api] fetch failed", {
+          endpoint: foodsEndpoint,
+          url: foodsUrl,
+          status: foodsResponse.status,
+        });
       }
     } catch (error) {
       console.error("[api] fetch failed", {
-        endpoint,
-        url,
+        endpoint: `${categoriesEndpoint}, ${foodsEndpoint}`,
+        url: `${categoriesUrl}, ${foodsUrl}`,
         status: "unavailable",
         error: error instanceof Error ? error.message : error,
       });
@@ -127,6 +178,7 @@ export function AdminFoodManager({ initialCategories }: { initialCategories: Cat
 
     setDeletedDish(food);
     setToastOpen(true);
+    setFoods((current) => current.filter((item) => item.id !== food.id));
     setCategories((current) =>
       current.map((category) => ({
         ...category,

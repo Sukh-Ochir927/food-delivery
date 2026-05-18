@@ -17,7 +17,24 @@ export const getCategories = async (): Promise<Categories> => {
       return [];
     }
 
-    return response.json();
+    const categories = (await response.json()) as Categories;
+
+    console.info("[admin-foods] /categories response", {
+      categoriesCount: categories.length,
+      firstCategory: categories[0]
+        ? {
+            ...categories[0],
+            foodsCount: Array.isArray(categories[0].foods)
+              ? categories[0].foods.length
+              : 0,
+            foods: Array.isArray(categories[0].foods)
+              ? categories[0].foods.slice(0, 1)
+              : [],
+          }
+        : null,
+    });
+
+    return categories;
   } catch (error) {
     unstable_rethrow(error);
     logApiFetchError({ endpoint, url, error });
