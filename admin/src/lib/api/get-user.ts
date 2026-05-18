@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
-import { apiUrl, authHeaders } from "./config";
+import { unstable_rethrow } from "next/navigation";
+import { apiUrl, authHeaders, logApiFetchError } from "./config";
 
 type GetUserResponse = {
   id: number;
@@ -8,21 +9,30 @@ type GetUserResponse = {
   name: string;
 };
 
-export const getUser = async (): Promise<GetUserResponse> => {
+export const getUser = async (): Promise<GetUserResponse | null> => {
   const cookieStore = await cookies();
 
   const token = cookieStore.get("token")?.value;
+  const endpoint = "/users/me";
+  const url = apiUrl(endpoint);
 
-  const response = await fetch(apiUrl("/users/me"), {
-    cache: "no-store",
-    headers: authHeaders(token),
-  });
+  try {
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: authHeaders(token),
+    });
 
-  if (!response.ok) {
-    return { id: 0, role: "", email: "", name: "Admin" };
+    if (!response.ok) {
+      logApiFetchError({ endpoint, url, status: response.status });
+      return null;
+    }
+
+    const userData = await response.json();
+
+    return userData;
+  } catch (error) {
+    unstable_rethrow(error);
+    logApiFetchError({ endpoint, url, error });
+    return null;
   }
-
-  const userData = await response.json();
-
-  return userData;
 };

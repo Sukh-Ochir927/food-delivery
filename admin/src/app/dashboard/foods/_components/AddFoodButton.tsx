@@ -4,6 +4,7 @@ import { ImageIcon, Plus, X } from "lucide-react";
 import { ChangeEventHandler, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { uploadImage } from "@/lib/upload-image";
+import { apiUrl } from "@/lib/api/config";
 
 import { Categories2 } from "../../orders/types/types";
 
@@ -52,14 +53,11 @@ export function AddFoodButton({ category }: CategoryProps) {
       posterPath: food.posterPath,
     };
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3001"}/foods`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        },
-      );
+      const response = await fetch(apiUrl("/foods"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
 
       const contentType = response.headers.get("content-type");
 

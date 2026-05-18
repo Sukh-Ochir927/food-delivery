@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, ChangeEventHandler } from "react";
+import { apiUrl } from "@/lib/api/config";
 
 export const AddCategoryButton = () => {
   const [open, setOpen] = useState(false);
@@ -33,7 +34,7 @@ export const AddCategoryButton = () => {
       name: categoryName,
     };
     try {
-      await fetch("http://localhost:3001/categories", {
+      await fetch(apiUrl("/categories"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),

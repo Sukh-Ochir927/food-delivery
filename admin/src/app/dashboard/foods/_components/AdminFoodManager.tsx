@@ -57,11 +57,26 @@ export function AdminFoodManager({ initialCategories }: { initialCategories: Cat
     activeCategory === "All Dishes"
       ? normalizedCategories
       : normalizedCategories.filter((category) => category.name === activeCategory);
+  const hasLoadedCategories = categories.length > 0;
 
   const refreshCategories = async () => {
-    const response = await fetch(apiUrl("/categories"), { cache: "no-store" });
-    if (response.ok) {
-      setCategories(await response.json());
+    const endpoint = "/categories";
+    const url = apiUrl(endpoint);
+
+    try {
+      const response = await fetch(url, { cache: "no-store" });
+      if (response.ok) {
+        setCategories(await response.json());
+      } else {
+        console.error("[api] fetch failed", { endpoint, url, status: response.status });
+      }
+    } catch (error) {
+      console.error("[api] fetch failed", {
+        endpoint,
+        url,
+        status: "unavailable",
+        error: error instanceof Error ? error.message : error,
+      });
     }
   };
 
@@ -141,6 +156,16 @@ export function AdminFoodManager({ initialCategories }: { initialCategories: Cat
 
   return (
     <div className="space-y-6">
+      {!hasLoadedCategories ? (
+        <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">
+          <h2 className="font-bold">Food categories are unavailable</h2>
+          <p className="mt-1">
+            Start the backend server and confirm NEXT_PUBLIC_API_URL points to it. The dashboard
+            is still available, but categories and dishes could not be loaded.
+          </p>
+        </section>
+      ) : null}
+
       <section className="rounded-2xl bg-white p-6 shadow-sm">
         <h1 className="mb-5 text-xl font-bold text-[#111827]">Dishes category</h1>
         <div className="flex flex-wrap gap-3">

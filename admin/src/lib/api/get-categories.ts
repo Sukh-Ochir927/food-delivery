@@ -1,15 +1,26 @@
 import { Categories } from "@/app/dashboard/orders/types/types";
-import { apiUrl, authHeaders } from "./config";
+import { unstable_rethrow } from "next/navigation";
+import { apiUrl, authHeaders, logApiFetchError } from "./config";
 
 export const getCategories = async (): Promise<Categories> => {
-  const response = await fetch(apiUrl("/categories"), {
-    cache: "no-store",
-    headers: authHeaders(),
-  });
+  const endpoint = "/categories";
+  const url = apiUrl(endpoint);
 
-  if (!response.ok) {
+  try {
+    const response = await fetch(url, {
+      cache: "no-store",
+      headers: authHeaders(),
+    });
+
+    if (!response.ok) {
+      logApiFetchError({ endpoint, url, status: response.status });
+      return [];
+    }
+
+    return response.json();
+  } catch (error) {
+    unstable_rethrow(error);
+    logApiFetchError({ endpoint, url, error });
     return [];
   }
-
-  return response.json();
 };
